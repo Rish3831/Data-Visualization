@@ -1,0 +1,443 @@
+---
+author: "Rishwanth Mithra"
+title: "Data_Visualization"
+output: html_document
+registration ID: "2311566"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+
+
+### Initializing the Temperature Data set
+```{r, eval= TRUE}
+
+Data_1 <- read.csv("temp2023.csv")
+str(Data_1)
+dim(Data_1)
+```
+
+### Initializing the Crime Data set
+```{r, eval= TRUE}
+
+Data_2 <- read.csv("crime23.csv")
+str(Data_2)
+dim(Data_2)
+
+```
+
+
+
+```{r, eval=TRUE}
+library(dplyr)
+sample_n(Data_1,3)
+```
+```{r,eval=TRUE}
+library(ggplot2)
+library(plotly)
+```
+### Correlation Analysis for Temperature Dataset
+```{r,eval=TRUE}
+cor_data <- Data_1[c("TemperatureCAvg","TemperatureCMax","TemperatureCMin","WindkmhInt","WindkmhGust","TdAvgC","HrAvg","PresslevHp","TotClOct","VisKm")]
+head(cor_data)
+cor_matr <- round(cor(cor_data),1)
+head(cor_matr)
+library(reshape2)
+melt_cor_matr <- melt(cor_matr)
+head(melt_cor_matr)
+library(ggplot2)
+g13<-ggplot(data = melt_cor_matr, aes(x=Var1, y=Var2, fill=value)) + geom_text(aes(Var2,Var1,label = value),color = "black", size=3)+
+  geom_tile()+scale_fill_gradient2(low = "red", high = "#35b3f2", limit = c(-1,1), space = "Lab", 
+   name="Pearson\nCorrelation")+ 
+  theme(axis.text.x = element_text(angle = 40, vjust = 1, 
+    size = 12, hjust = 1))+ggtitle("Correlation matrix for features of the tempearture data")
+ggplotly(g13)
+
+
+```
+
+
+The graph above demonstrates the Pearson Correlation analysis plot for different features of temperature data set.
+The maximum temperature and the average temperature feature has the highest positive correlation value of one where the values vary proportionally. Following that, Minimum temperature and average dew point temperature features has the correlation value of 0.9 with maximum and average temperature variables. Wind speed and wind gust in Km/Hr features has the weakest positive correlation with minimum temperature having the value of 0.1. The features maximum temperature and average relative humidity are most negatively correlated with the value of -0.6 where the data vary inversely proportional.
+
+### Histogram Plot
+```{r, eval=TRUE}
+
+
+g2<-ggplot(Data_1, aes(x=TemperatureCAvg))+geom_histogram(col='black',fill = "#143d80")+xlab('Average Temperature')+ylab('Counts in Celcius')+ggtitle("Histogram for Average Temperature")
+ggplotly(g2)
+
+```
+The above plot describes the histogram for the average air temperature at 2 meters above ground level in Celsius for the given variable which is a Continuous uni variate variable. The most average temperature appears to be 7.9 degree Celsius and 8.8 degree Celsius which is around 27 counts. And the least number of counts for average temperature is 2 for -2.6 degree Celsius, 20.3 degree Celsius and 23.0 degree Celsius.
+
+### One Way Table
+```{r, eval=TRUE}
+#install.packages("kableExtra")
+
+
+library(kableExtra)
+a <- table(Data_1$WindkmhInt)
+kable(a)
+
+```
+The one way table above gives the information of the Wind speed in Kilometer per hour and its frequency. From the table, we can view that the wind speed of 16.1 Km/Hr has the frequency of 8 which shows the highest frequency of all the other values of the data. And we can view the frequencies of the other values as well.
+
+### Density Plot
+```{r, eval=TRUE}
+
+
+g1<-ggplot(Data_1, aes(x=WindkmhGust))+ geom_density(kernel = "gaussian",color="darkgreen",fill="lightgreen")+xlab('Wind Km/Hr Gust')+ggtitle("Density curve for Windgust")
+ggplotly(g1)
+
+```
+The graph shows the density plot of a continuous single variable which illustrates the speed of the wind gust in Kilometers per hour. The maximum density from the above plot is 0.032 for the speed of the wind gust of 36 kilometer per hour which describes that it is the actual occurrence of wind gust normally.
+
+### Two Way Table
+```{r, eval=TRUE}
+
+b<-table(Data_2$category,Data_2$outcome_status)
+kable(b)
+```
+The above Two way table explains the relation between category of the crimes that took place in Colchester and their outcome status. For example, by the two way table, we can see that 595 cases of violent crime has given the outcome status to be investigation complete and 1299 cases of it are unable to prosecute the suspect.The drugs which is the category of crime has the highest outcome status of Local resolution with the value of 98. 
+
+### Frequency Polygon plot 
+```{r, eval=TRUE}
+
+
+g3<-ggplot(Data_1, aes(x=TemperatureCMax))+geom_freqpoly(col = '#c41010')+xlab('Maximum Temperature')+ylab('Counts in Celcius')+ggtitle("Frequency polygon for maximum temperature")
+ggplotly(g3)
+
+```
+Frequency Polygons helps to visualize the distribution of a single continuous variable which divides the x-axis into number of bins and calculating the observations occurred in each bin. The most maximum temperature appears to be 11.8 degree Celsius which is around 32 counts. And the least number of counts for maximum temperature is 1 for 27.7 degree Celsius.
+
+### Box Plot
+```{r, eval=TRUE}
+ 
+
+g4<-ggplot(Data_1, aes(x=WindkmhDir,y=TemperatureCMin, fill=WindkmhDir, color =WindkmhDir ))+geom_boxplot()+xlab('Wind Directions')+ylab('Minimum Temperature in C')+ggtitle('Box plot using mininum temperature and Wind directions')
+ggplotly(g4)
+
+```
+From a box plot above, it displays the distribution of a continuous variables which are minimum temperature and different wind directions. From the plot, different wind directions has many different quartile range values, the wind directions passing from south tilted to other directions has the most minimum temperature value of 16.3 degree Celsius. The wind directions passing from East-Northeast has to most median value 12.2 degree Celsius.There are two outliers in the wind directions passing from West-Southwest(WSW) and Southwest(SW). 
+
+### Jitter plot
+```{r, eval=TRUE}
+
+
+g5<-ggplot(Data_1, aes(x=HrAvg,y=TdAvgC))+geom_jitter(col='#6acefc')+ylab('Dew point temperature in C')+xlab('Avg Relative Humidity')+ggtitle("Scatter plot with Dew point temperature and Humidity")
+ggplotly(g5)
+
+```
+The above graph explains the dew point temperature where relative humidity reaches its minimum to maximum level in which saturation occurs. The plot describes that there are 75 to 95 percent chances of getting Average relative humidity when the dew point temperature is between 3 to 13 degree Celsius where the air can hold no more water which in turn the air feels comfortable.
+
+
+### Smooth and jitter plot
+```{r, eval=TRUE}
+
+
+g6<-ggplot(Data_1, aes(y=TemperatureCMax,x=SunD1h))+geom_smooth(col='#1a13eb')+geom_jitter(col="#894eed")+xlab('Sunshine duration in Hours')+ylab('Max Temperature in Celcius')+ggtitle('Analyzing Sunshine duration and Max Temperature using smooth curve')
+ggplotly(g6)
+
+```
+In the above plot, we have used jitter and smooth plot combined to visualize the effective area of interest for two different features. With the help of smooth curve, the duration of sunshine is low as to less than one hour when the average maximum temperature is near 13 degree Celsius and sunshine duration is high, nearly 15 hours when the average maximum temperature roughly 25 degree Celsius.
+
+### Pair Plots
+```{r,eval=TRUE}
+
+
+Average_Temp <- Data_1$TemperatureCAvg
+Minimum_Temp <- Data_1$TemperatureCMin
+Maximum_Temp <- Data_1$TemperatureCMax
+pairs(cbind(Average_Temp,Maximum_Temp,Minimum_Temp),cex=0.5,pch=19, col="#a11313")
+```
+Here, we have plot the pair to define the relationship between three continuous variable which are minimum, maximum and average temperatures. 
+
+### Time series
+```{r,eval=TRUE}
+
+# Importing the library
+library(lubridate)
+
+# Parsing the Date 
+Data_1$Date<-ymd(Data_1$Date)
+#Data_1$Date<-dmy(Data_1$Date)
+class(Data_1$Date)
+
+# Initializing month from date
+dmonth<-month(Data_1$Date)
+Data_1$dmonth<-dmonth
+print(dmonth)
+head(Data_1)
+
+# Grouped Month and Max Temperature
+x=Data_1 %>% 
+  group_by(dmonth, TemperatureCMax) %>%     
+  summarize(m = mean(TemperatureCMax)
+            ) 
+
+```
+In the above code, we are parsing the date column and extracting only the month to create a feature in the given data set. While parsing the data, I have used dmy function. Sometimes, dmy function is giving me error filling NA values in Date column. Alternatively, I have used ymd function to parse the date column.
+
+```{r,eval=TRUE}
+
+
+g7<-ggplot(x, aes(x=dmonth,y=m))+geom_point(col='red',size = 0.5, alpha = 0.9, stroke = 2)+geom_line()+xlab("Months of the year")+ylab("Maximum Temperature")+ggtitle(" Analyzing Maximum Temperature for different months over the Year with time series")
+ggplotly(g7)
+
+```
+In the above picture, we are creating the time series plot by using geom point function which helps the to allow precise representation of individual data points and geom line function helps to connect the data points in the order of the variable in the x-axis. Over the year, the months from June to September has the high values of maximum temperature having the high mean value of nearly 30 degree Celsius due to summer and all other months have low values of Maximum temperature due to fall and spring seasons.
+
+
+### Quantile plot
+```{r, eval=TRUE}
+
+
+g8<-ggplot(Data_1, aes(y=WindkmhInt,x=TotClOct))+geom_quantile(col='#1a13eb')+geom_point()+xlab("Cloudines in octants")+ylab("Wind speed Km/Hr")+ggtitle("Quantile plot for WindSpeed and Cloudiness")
+ggplotly(g8)
+
+```
+The mentioned plot above gives the quantile plot to analyze the wind speed feature with the cloudiness in Octants. The lines give the variability in relationship between windspeed and cloudiness starting from windspeed having 10, 11 and 15 kilometers per hour to 13, 18 and 23 kilometers per hour for all range of values from 0 to 8 of cloudiness data. Therefore, these values are considered as median or other specified quantiles of relationship between the two variables.
+
+### Bar Plot
+```{r,eval=TRUE}
+
+
+g9<-ggplot(Data_1, aes(x=WindkmhDir,y=TotClOct))+geom_bar(stat = "identity",col='#f2aa3d',fill = '#f2aa3d')+xlab('Wind Km/Hr Direction')+ylab('Cloudiness')+ggtitle(" Visualizing Wind Directions with Cloudiness in octants ")
+ggplotly(g9)
+
+```
+The above bar graph explains the effects of wind directions over the cloudiness in octants. The wind direction flowing from west which is angled to south but direction more specific to west (WSW) has more clouds in octants than to any other direction according to the given data. Following with the wind directions of South-Southwest(SSW) and Southwest(SW) has more cloudiness. The winds flowing from East has less clouds compared to winds flowing from other directions.
+
+### Density 2d Plot
+```{r, eval=TRUE}
+
+
+g10<-ggplot(Data_1, aes(x=HrAvg,y=PresslevHp))+geom_density_2d(linejoin = "round",color="red")+geom_point()+xlab('Relative Humidity')+ylab('Sea Level Pressure in hpa')+ggtitle("2D Density plot")
+ggplotly(g10)
+```
+
+We have used density 2d plot to demonstrate the relationship between two continuous numeric variables. We can see that there are two center contours where the sea level pressure values range from 1015 to 1025 hpa and 1005 to 1010 hpa  with relative humidity of 75 to 77 and 80 t0 85 respectively.
+
+### Generating the map
+```{r,eval=TRUE}
+# Importing leaflet
+
+#install.packages('leaflet')
+library(leaflet)
+
+# Grouping the variables 
+
+z=Data_2 %>% 
+  group_by(lat, long, street_name,category) %>%     # grouped Latitude, Longitude, Street Name and                                                                                                 Category
+  summarize(o = table(street_name) 
+            ) 
+z2=Data_2 %>% 
+  group_by(lat, long, street_name) %>%     # grouped Latitude, Longitude, Street Name and                                                                                                 Category
+  summarize(o = table(street_name) 
+            ) 
+ 
+
+z2 %>%
+  leaflet() %>%
+  addTiles() %>%setView(0.902165, 51.889225, zoom = 14.5)%>%
+  addCircleMarkers(data = z2,color = "red",radius = ~o * 0.2,popup =  ~paste(street_name, "<br>Count = ",o))
+
+
+```
+We have visualized the count of crimes in each specified areas from the given data set using the map that is generated above. The circles having less red color intensity has less crimes and circles having more red color intensity has more crimes. The crimes in certain areas can range from one to hundreds. The highest crime has occurred on near shopping area with the crime count of 164.
+
+### Generating the map for top three crimes
+```{r, eval=TRUE}
+
+
+z %>%
+  leaflet() %>%
+  addTiles() %>%setView(0.902165, 51.889225, zoom = 14.5)%>%
+  addCircleMarkers(data = z[z$category=='violent-crime',], col="#f23535",fillOpacity = 1,popup =  ~paste(category))%>%addCircleMarkers(data = z[z$category=='anti-social-behaviour',], col="#0c30f7",fillOpacity = 0.5,popup =  ~paste(category))%>%addCircleMarkers(data = z[z$category=='criminal-damage-arson',], col="#1ddb46",fillOpacity = 0.5,popup =   ~paste(category))
+
+
+```
+
+The above map gives the top three crimes occurred in Colchester in the year 2023. The most crime which has took place is violent crime which is marked in red circles having more intensity following with anti social behavior crime plotted with blue circles and the criminal damage arson crime with green circles having medium intensity. 
+
+### Bar plot with heat colors
+```{r, eval=TRUE}
+
+
+  Data_2_c <- Data_2
+  Data_2_c$category<- factor(Data_2$category,levels = names(sort(table(Data_2$category),increasing = TRUE)))
+  g11<-ggplot(Data_2_c, aes(x = category)) + 
+  
+  geom_bar(fill=rev(heat.colors(n=length(unique(Data_2_c$category))))) + 
+  xlab("Crimes")+ylab("Number of Crimes")+ggtitle(" Heat colored Bar Graph for Crimes commited in 2023")+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))+scale_y_continuous(breaks=seq(0,3000,by=500))
+#theme_classic()
+ggplotly(g11)
+```
+The above picture of bar plot describes the total numbers crimes occurred for each category of crimes in Colchester in the year 2023. The highest crime that has been taken place is violent crime having the count of 2633 followed by anti-social-behaviour of 677 counts, criminal damage arson of 581 counts and so on. The least crime that come into being is possession of weapons which is 74 times in Colchester. 
+
+### Time Series Plot
+```{r,eval=TRUE}
+
+
+library(plotly)
+library(xts)
+library(ggplot2)
+library(lubridate)
+library(dplyr)
+s=Data_2 %>% group_by(date) %>% summarize(c_crimes = table(date)) 
+
+s$c_crimes
+s
+v<-as.numeric(s$c_crimes)
+tdates <- ym(s$date)
+tscases <- xts(data.frame(v=v),tdates)
+autoplot(tscases,facet=NULL)+theme_bw()+geom_point(color="darkblue")+geom_line(col="#944806")
+
+```
+The above time series plot explains about the number of crimes took place in Colchester for each month over the year of 2023. By including all the categories of crime, the most crimes occurred is seen to be in the month of January which is more than 650 and the second most is in September which is near to 650. The least crimes that have been committed is in the month of February which is nearly 460 to 470. Rest all other months are count of crimes in the range of 550 to 600.
+
+### Pie Chart
+```{r,eval=TRUE}
+
+
+library(plotly)
+plot_ly(Data_2, labels = ~category, type = "pie") %>%
+  layout(title = "Pie Chart for Categories of Crimes")
+
+```
+
+From the pie chart above, among all the crimes that have been taken place in colchester, Violent crime is the most that has been carried out which covers 38 percent. By this we can tell that, violent crime is committed in most of the areas of the city. Rest all the remaining crimes occurred are less than ten percent by comparing with each other as a whole. The least crimes that has been took over is theft from the person and the possession of weapons which is nearly just one percent.
+
+### Bar Plot for outcome status variable
+```{r, eval=TRUE}
+
+
+g12<-ggplot(Data_2, aes(x=outcome_status))+geom_bar(linetype="Stuff Hauler", colour="darkgreen",fill = "#d0f2ce")+ coord_flip()+ggtitle("Investigating the outcome status of the crimes ")
+ggplotly(g12)
+
+```
+The Bar graph in the above picture demonstrates the count values of each outcome status. According to the given data, most of the crimes occurred have completed their investigation and as a result, no suspect has been identified.They have the total count of 2656, following that are the crimes having result where the outcome status is that they are not able to take legal proceedings against a suspect which are having count of 1959. All the other remaining outcome status has the count of less than 700. The least occurrences of outcome status is the suspect charged as a part of another case which has value count of one. 
+
+
+ 
+### Bar Plot analysis for crimes in January 
+```{r,eval=TRUE}
+
+
+b <- Data_2[Data_2$date=="2023-01",]
+#b$category<- factor(Data_2$category,levels = names(sort(table(Data_2$category),increasing = TRUE)))
+g14<-b %>%
+  count(category) %>%
+  ggplot(aes(x = reorder(category,-n) ,y = n)) + 
+  geom_col(fill="#1da5db") + #arrange(desc(b$category))
+  xlab("Crimes")+ylab("Number of Crimes in January")+ggtitle("Crimes commited in January 2023")+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+#theme_classic()
+ggplotly(g14)
+
+```
+As most of the crimes that has been taken place is in the month of January as seen in time series plot,we have plot the bar graph to count the number of crimes occurred in the month of January, 2023. By the data above, we can illustrate that the most committed crime in the month of January is Violent crime which counts up to 237. The second most committed crime in January is shoplifting which has the count of 76 and the remaining crimes are in the range of 6 to 60. The least crime that is carried out is possession of weapons which occurred 3 times in January.
+
+
+# CONCLUSION
+```{r,eval=TRUE}
+
+
+# Duplicating the Crime data
+Crime_Data_2 <- Data_2
+
+# Adding Day value to date structure and extracting the month column
+Crime_Data_2$date <- as.Date(paste0(Crime_Data_2$date,"-01"), format = "%Y-%m-%d")
+Crime_Data_2$Month <- format(as.Date(Crime_Data_2$date), "%b")
+Crime_Data_2$Month <- factor(Crime_Data_2$Month, levels = c(as.list(month.abb)))
+
+# Creating table to view the count of crimes according to month 
+crime_count <- as.data.frame(table(Crime_Data_2$Month))
+colnames(crime_count) <- c("Month", "CrimeCount")
+
+# Replacing NaN values with Median values for precipitation`
+med_value <- median(Data_1$Precmm, na.rm = TRUE)
+Data_1$SunD1h[is.na(Data_1$Precmm)] <- med_value
+
+# Duplicating the Temperature data
+temp_Data <- Data_1
+
+# Extracting Month from Date column
+temp_Data$Month <- format(as.Date(temp_Data$Date), "%b")
+
+# Extracting features with mean values and grouping them with Month
+temp_change <- temp_Data %>% group_by(Month) %>% summarise(avg_temperature = mean(TemperatureCAvg, na.rm = TRUE), avg_wind_speed = mean(WindkmhInt, na.rm = TRUE), avg_visibility = mean(VisKm, na.rm = TRUE),avg_prc = mean(Precmm, na.rm = TRUE),avg_cloud = mean(TotClOct, na.rm = TRUE))
+
+# Merging the two sets of table into one
+temp_crime_dataset <- merge(crime_count, temp_change, by = "Month", all = TRUE)
+
+
+```
+
+In the above code, we have combined crime data set with temperature data set by using date column as common which is present in both the data sets.
+
+### Correlation plot for combined data sets
+```{r, eval=TRUE}
+cor2_data <- temp_crime_dataset[c("CrimeCount","avg_temperature","avg_wind_speed","avg_visibility","avg_prc","avg_cloud")]
+head(cor2_data)
+cor2_matr <- round(cor(cor2_data),1)
+head(cor2_matr)
+library(reshape2)
+melt_cor2_matr <- melt(cor2_matr)
+head(melt_cor2_matr)
+library(ggplot2)
+g15<-ggplot(data = melt_cor2_matr, aes(x=Var1, y=Var2, fill=value)) + geom_text(aes(Var2,Var1,label = value),color = "black", size=3)+
+  geom_tile()+scale_fill_gradient2(low = "red", high = "orange", limit = c(-1,1), space = "Lab", 
+   name="Pearson\nCorrelation")+ 
+  theme(axis.text.x = element_text(angle = 40, vjust = 1, 
+    size = 12, hjust = 1))+ggtitle("Correlation matrix for features of combined data sets")
+ggplotly(g15)
+```
+
+The above correlation matrix helps to correlate the features of combined data sets of crime and temperature data. The highest correlation we are getting with crime count is average precipitation which is 0.4 which is the positive correlation. Average precipitation and average wind speed has the negative correlation of -0.2 and -0.1 respectively.
+
+### Scatter Plot for average precipitation and Crime Count
+```{r,eval=TRUE}
+g16<-ggplot(temp_crime_dataset, aes(y=CrimeCount,x=avg_prc))+geom_point( colour="darkblue")+ggtitle("Correlating the average precipitation with crime count ")+xlab("Average Precipitation")+ylab("Number of Crimes")
+ggplotly(g16)
+```
+The above plot gives the scatter plot of the features having best correlation both temperature and crime data sets. The average precipitation is highly correlated with count of the crimes in Colchester in the year 2023. For average precipitation range of 0 to 3.2 mm, there are more number of crimes occurred which shows the greater significance than any other features.
+  
+
+# SUMMARY:
+
+Initially, we have assigned the temperature data set and crime data to two different variables and analyzed the data sets separately. The one way table depicts the information about the wind speed feature of the temperature data set and its frequency. The two way table analyzes the category and outcome status features of the crime data set. We can view every type of outcome status for each of the category of crimes.The histogram generated gives the plot for average air temperature at 2 meters above ground level. Histogram is easy to understand and interpret as it helps to identify the distribution patterns quickly for comparing the variables with the data sets. The density plot explains the speed of wind gust in Kilometers per hour. The density plot represents the distribution of a numeric variable that uses Gaussian kernel density estimate to view the probability density function of a variable. The frequency polygon plot gives the information of Maximum air temperature at 2 meters above ground level. With the help of this plot, we can easily identify the variation of the continuous variable according to the given data.
+
+We have used box plot to analyze the minimum temperature for different wind directions. With the help of Geom_boxplot function, it draws a box from the first quartile to the third quartile and a verticle line goes through the box at the median. The whiskers which are lines extending from the box go from both the quartiles to the minimum and maximum. With the help of the box plot we can view many different variations of the data including median values and spot the outliers.We have used jitter plot to analyze the dew point temperature with relative humidity as it helps to visualize the density of the scattered points for particular range of values according to the given data. Jitter plot helps to get a clear picture of the true underlying relationship between two continuous variables in a data set and helps with the better view of overlapping data points. We have used jitter with smooth curve to examine the relation between maximum temperature and the duration of the Sunshine. Jitter plots helps the hidden data to be revealed and it is easier to visualize the data points distributed and the smooth plot helps to add the regression line to the given data points. Smoothing helps to identify the data points that are of interest which describes the best fit of the data. Pair plot is also known as scatter plot matrix helps to describe the pairwise relationships between the multiple variables in a data set and we have used to inspect the features such as minimum, maximum and average temperatures. The relation between average temperature and maximum temperature is less scattered which illustrates a strong relation between the two continuous variables and the relation between maximum temperature and minimum temperature is more scattered which tells that there is weak relation between the two continuous variables.
+
+We have used time series plot to analyze the maximum temperature for all the months over the year starting from January to December. Before analyzing we have parsed only the month from the feature called Date in the temperature data set by importing the lubridate library which helps parsing functions read strings into R as date-time objects. We are parsing the Date column that is used to parse a date from a character vector that has the day first, month second, and year last. And then we are creating a separate column for month into the same data set which represents the feature month. And finally, we are grouping the month and Maximum temperature features by taking mean value of the maximum temperature to represent the relationship between the two variables. The time series plot describes the mean values of the maximum temperature for different months in the whole year. We have used quantile plot to visualize the total cloudiness for different wind speeds. The quantile graph fits the quantile regression to the data and draws the lines with the fitted quantiles. The quantile regression line helps to understand the relationship between variables outside of the mean of the data. There are three outcomes that helps us to understand the non-linear relationship that wind speed variable has towards the cloudiness variable. The bar graph has been used to examine the cloudiness for different wind directions. With the help of the bar graph data, we can tell that where the clouds in octants can be generated according to the direction of the flow of winds.
+
+We have used 2d Density plot to visualize the relative humidity with the sea level pressure feature. The 2d density plot helps to avoid overlapping and divides the plot area in a multitude of small fragments to represent the points in the fragments. We have analyzed the sea level pressure with the relative humidity and we can see that the fragments formed helps to visualize the density distribution of particular values with the help of the contours where fragments are connected.  With the help of this structure, it is easy to explain the density of the features used by specifying the range of values of each particular variable with the help of contours.
+
+We have generated the map with the help of leaflet library and using the specific functions to envision the number of crimes took place in every areas of the Colchester. We have grouped certain variables such as latitude,longitude and street name which helps to display the certain streets names in the map and we have grouped category to know the count of crimes having different categories in a particular street. With the help of map generated, we can directly visualize the areas where most and the least crimes that has transpired.We have created a map to feasibly visualize the top three offences that has come about in the Colchester City. By viewing the map, we can say that most of the three crimes have been took place in central region of Colchester which are main areas such as near Osborne street and High Street. We have produced a bar plot with heat colors which they tend to think of warm colors such as orange, red and yellow. The graph illustrates the count of each crimes committed in the year 2023. We have sorted the category of crimes by their counts in an increasing order by using sort function and used heat colors function for the variation of intensity of the color.     
+
+With the help of time series plot, we have gathered the information of number of crimes in Colchester that have took place in every month of the year 2023. Time series gives the actual variation of the increase and decrease in the count.We have plotted pie chart to visualize the aggregate of all the categories of crimes that have occurred in Colchester in the year 2023. This plot helps to display the multiple features of the data in one chart and compare the quantity of each features relatively. We have generated a bar graph to examine the count of outcome status of the crimes in Colchester in the year 2023. The bar graph helps to view the count of each category of the variable and compare the data easily. With the help of this correlation chart, it is helpful to justify the feature dependencies and analyzing the data accordingly. With the help of the correlation matrix, we can visualize the features which are positively correlated or negatively correlated and how strong they are correlated.
+
+We have plotted the bar graph to count the number of crimes in January. This graph helps to visualize the data easily to view the count for each category of the crime as it demonstrates the relationship between the two variables. A bar graph can also examine the changes in data throughout the period of time.
+
+# CONCLUSION:
+
+There is a relationship between temperature data set and crime data set by the features used in both the data sets.
+To correlate the features of crime data set with the temperature data set, we are combining both the data sets using date column as common. Initially, we have duplicated both data sets and extracted month column from crime data by adding day values to each and every month of it. And we have created a separate table for count of crimes according to month of crime data set. For temperature data set, we extracted the month from date column and grouped certain features with month so that it helps to correlate with the crime data by taking mean values of all the features and created another table for climate change by month. Finally, we merged both the tables to help us view the correlation between crime and temperature data sets.
+
+We have correlated temperature data with the crime data using features such as visibility, wind speed, precipitation, cloudiness and average temperature using the combined data set. These features in temperature data set gives good correlation to the number of crimes in the crime data set. The best feature which gives correlation to the number of crimes is average precipitation which shows the highest positive correlation to the crimes than other features. Hence, we conclude that, when the precipitation value is more then the number of crimes is more as they correlated positively.
+
+
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

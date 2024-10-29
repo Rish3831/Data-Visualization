@@ -2,6 +2,8 @@
 
 This project examines the relationship between weather conditions and crime rates. By analyzing temperature and crime datasets, we aimed to uncover potential correlations between climatic variables and crime occurrences. We employed various visualizations and statistical methods to better understand and interpret these relationships.
 
+![Screenshot 2024-10-29 115352](https://github.com/user-attachments/assets/cdcbce8e-06cf-43ff-a7f6-e53dab83fd0b)
+
 
 ---
 

@@ -4,6 +4,7 @@ This project examines the relationship between weather conditions and crime rate
 
 ![Screenshot 2024-10-29 115352](https://github.com/user-attachments/assets/cdcbce8e-06cf-43ff-a7f6-e53dab83fd0b)
 
+![Screenshot 2024-10-29 115517](https://github.com/user-attachments/assets/244827e0-78cc-470a-9370-29643bfbcce3)
 
 ---
 
